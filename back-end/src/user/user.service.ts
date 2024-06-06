@@ -24,14 +24,6 @@ export class UserService {
         return await this.userRepo.find();
     }
 
-    // async findOne(data) {
-    //     const user = await this.userRepo.findOne({
-    //       where: [{ name: data.val }, { email: data.val }],
-    //     });
-    //     if (user) return user;
-    //     else throw new NotFoundException('No user found');
-    //   }
-
     async findOne(data:any) {
         //find by id
         const val = parseInt(data);
@@ -42,6 +34,27 @@ export class UserService {
         }
         //find by email
         return await this.userRepo.findOne({where: {email:data}});
+    }
+
+    async findUser(value: string) {
+        const val = parseInt(value);
+        let user;
+
+        if (Number.isInteger(val)) {
+            user = await this.userRepo.findOne({
+                where: { id: val },
+            });
+        } else {
+            user = await this.userRepo.findOne({
+                where: { email: value },
+            });
+        }
+
+        if (!user) {
+            throw new NotFoundException('No user found');
+        }
+
+        return user;
     }
 
     async delete(id: number) {

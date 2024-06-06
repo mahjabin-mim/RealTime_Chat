@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import LogoutButton from '@/app/(components)/logoutButton/page';
 
 interface User {
   id: number;
@@ -20,7 +19,7 @@ interface DecodedToken {
   exp: number;
 }
 
-const Landing = () => {
+const ConversationList = () => {
     const [users, setUsers] = useState<User[]>([]);
     //const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -119,60 +118,41 @@ const Landing = () => {
       router.push(`/chat?userEmail=${userEmail}`);
     };
 
-    const handleConversation = () => {
-      router.push("/conversation");
-    };
+    const handleConversationClick = (userEmail: string) => {
+        router.push(`/conversation?userEmail=${userEmail}`);
+      };
 
     return (
-      <>
-      <div className='flex justify-end items-center space-x-4 mt-10 mr-10'>
-        <p className="text-blue-600">welcome {loggedInUserEmail}</p>
-        <LogoutButton/>
-      </div>
-      <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Address</th>
-              <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.email} className="hover:bg-gray-100">
-                <td className="px-4 py-2 text-left">{user.name}</td>
-                <td className="px-4 py-2 text-left">{user.email}</td>
-                <td className="px-4 py-2 text-left">{user.address}</td>
-                <td className="px-4 py-2 text-left">{user.role}</td>
-                {/* <td className="px-4 py-2 text-center">
-                  <button
-                    onClick={() => handleStartChat(user.email)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  >
-                    Send message
-                  </button>
-                </td> */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-4 text-center">
-        <button
-          onClick={() => handleConversation()}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          All Conversations
-        </button>
-      </div>
-    </div>
+    <>
+        <div className="container mx-auto p-4 min-w-80">
+            <h1 className="text-2xl font-bold mb-4 ml-4">Chat</h1>
+            {/* <div className="container mx-auto p-4 min-w-80 flex items-center">
+                <h1 className="text-2xl font-bold mr-4">Chat</h1>
+                <div className="flex-grow">
+                    <input
+                    type="text"
+                    placeholder="Search"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                    />
+                </div>
+            </div> */}
+            <div className="overflow-y-auto h-96">
+                <ul>
+                {users.map((user) => (
+                    <li
+                    key={user.email}
+                    className="p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleConversationClick(user.email)}
+                    >
+                    <div className="font-bold">{user.name}</div>
+                    <div className="text-gray-600">{user.email}</div>
+                    </li>
+                ))}
+                </ul>
+            </div>
+        </div>
     </>
     );
 };
 
-export default Landing
+export default ConversationList

@@ -3,8 +3,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import LogoutButton from '@/app/(components)/logoutButton/page';
-import BackButton from '@/app/(components)/backButton/page';
 
 interface ShowChat {
   id: number;
@@ -33,30 +31,27 @@ const Chat = () => {
     if (userEmail) {
       setData((prevData) => ({ ...prevData, receiver: userEmail }));
 
-      // const fetchUserName = async () => {
-      //   try {
-      //     const response = await fetch("http://localhost:8000/user/search", {
-      //       method: "Get",
-      //       headers: {
-      //         "Content-Type": "application/json"
-      //       },
-      //       body: JSON.stringify({ email: userEmail })
-      //     });
+      const fetchUserName = async () => {
+        try {
+          const response = await fetch(`http://localhost:8000/user/finduser?value=${userEmail}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
 
-      //     if (response.ok) {
-      //       const user = await response.json();
-      //       setReceiverName(user.name);
-      //     } else {
-      //       //alert("not found");
-      //       throw new Error('Failed to fetch user name');
-      //     }
-      //   } catch (error) {
-      //     //alert("fetching not found")
-      //     console.error('Error fetching user name:', error);
-      //   }
-      // };
+          if (response.ok) {
+            const user = await response.json();
+            setReceiverName(user.name);
+          } else {
+            throw new Error('Failed to fetch user name');
+          }
+        } catch (error) {
+          console.error('Error fetching user name:', error);
+        }
+      };
 
-      //fetchUserName();
+      fetchUserName();
     }
   }, [userEmail]);
 
@@ -149,52 +144,43 @@ const Chat = () => {
 
   return (
     <>
-    <div className='flex justify-between'>
-      <div className='flex justify-start mt-10 ml-10'>
-        <BackButton/>
+    <div className="max-w-md mx-auto">
+      <div className='bg-white shadow-md rounded-lg h-10 mb-1 flex items-center'>
+        <p className="ml-4 font-semibold text-lg font-sans tracking-wide">{receiverName}</p>
       </div>
-      <div className='flex justify-end items-center space-x-4 mt-10 mr-10'>
-        <p className="text-blue-600">welcome {loggedInUserEmail}</p>
-        <LogoutButton/>
-      </div>
-    </div>
-    <p className=" ml-52 text-orange-700 font-bold mb-4">{data.receiver}</p>
-    <div className="flex flex-col h-96 max-w-md mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-    {/* <div className="flex flex-col flex-grow p-4 overflow-y-auto bg-gray-100"> */}
-    <div className="flex flex-col flex-grow p-4 overflow-y-auto">
-      <div className="flex flex-col space-y-2">
-        {chatdata.length > 0 ? (
-          chatdata.map((chat) => (
-            <div key={chat.id} className={`flex ${chat.sender === loggedInUserEmail ? 'justify-end' : 'justify-start'}`}>
-              <div className={`rounded-lg p-2 ${chat.sender === loggedInUserEmail ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                {/* <p className="text-xs text-right">{chat.sender}</p> */}
-                <p className="text-sm">{chat.message}</p> 
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500 text-center">No messages yet</p>
-        )}
-      </div>
-    </div>
-    <div className="p-4 border-t">
-      <form onSubmit={handleSubmit} className="flex space-x-2">
-        <input
-          type="text"
-          name="message"
-          value={data.message}
-          onChange={handleChange}
-          required
-          placeholder="Type here"
-          className="flex-grow p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
-        >
-          Send
-        </button>
-      </form>
+    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="flex flex-col h-96 p-4 overflow-y-auto">
+            {chatdata.length > 0 ? (
+                chatdata.map((chat) => (
+                    <div key={chat.id} className={`flex ${chat.sender === loggedInUserEmail ? 'justify-end mt-1' : 'justify-start mt-1'}`}>
+                        <div className={`rounded-lg p-2 ${chat.sender === loggedInUserEmail ? 'bg-fuchsia-900 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                            <p className="text-sm font-sans tracking-wide">{chat.message}</p>
+                        </div>
+                    </div>
+                ))
+            ) : (
+                <p className="text-gray-500 text-center">No messages yet</p>
+            )}
+        </div>
+        <div className="p-4 border-t">
+            <form onSubmit={handleSubmit} className="flex space-x-2">
+                <input
+                    type="text"
+                    name="message"
+                    value={data.message}
+                    onChange={handleChange}
+                    required
+                    placeholder="Write messages..."
+                    className="flex-grow p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                />
+                <button
+                    type="submit"
+                    className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
+                >
+                    Send
+                </button>
+            </form>
+        </div>
     </div>
     </div>
     </>
